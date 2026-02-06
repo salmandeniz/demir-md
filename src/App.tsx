@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { ask } from "@tauri-apps/plugin-dialog";
 import { useTheme } from "./hooks/useTheme";
 import { useMarkdownDocument } from "./hooks/useMarkdownDocument";
 import { useFileOperations } from "./hooks/useFileOperations";
@@ -25,9 +26,31 @@ function App() {
   useKeyboardShortcuts(stableFileOps);
 
   useEffect(() => {
-    const title = isDirty ? `${fileName} * - Markdown Reader` : `${fileName} - Markdown Reader`;
+    const title = isDirty ? `${fileName} * - DemirMD` : `${fileName} - DemirMD`;
     getCurrentWindow().setTitle(title);
   }, [fileName, isDirty]);
+
+  const isDirtyRef = useRef(isDirty);
+  useEffect(() => {
+    isDirtyRef.current = isDirty;
+  }, [isDirty]);
+
+  useEffect(() => {
+    const unlisten = getCurrentWindow().onCloseRequested(async (event) => {
+      if (isDirtyRef.current) {
+        const confirmed = await ask("You have unsaved changes. Close anyway?", {
+          title: "Unsaved Changes",
+          kind: "warning",
+        });
+        if (!confirmed) {
+          event.preventDefault();
+        }
+      }
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
 
   useEffect(() => {
     const unlisten = listen<string>("menu-event", (event) => {

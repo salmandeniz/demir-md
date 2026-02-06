@@ -71,3 +71,11 @@ body,
 .dark .preview-content::-webkit-scrollbar-thumb {
   background-color: #4b5563;
 }
+
+body {
+  transition: background-color 0.2s ease;
+}
+
+.split-view-sash:hover {
+  transition: background-color 0.15s ease;
+}
