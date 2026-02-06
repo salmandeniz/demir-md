@@ -38,12 +38,13 @@ function App() {
   useEffect(() => {
     const unlisten = getCurrentWindow().onCloseRequested(async (event) => {
       if (isDirtyRef.current) {
+        event.preventDefault();
         const confirmed = await ask("You have unsaved changes. Close anyway?", {
           title: "Unsaved Changes",
           kind: "warning",
         });
-        if (!confirmed) {
-          event.preventDefault();
+        if (confirmed) {
+          getCurrentWindow().destroy();
         }
       }
     });
