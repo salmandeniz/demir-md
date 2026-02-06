@@ -103,7 +103,7 @@ function App() {
         viewMode={viewMode}
         onSetViewMode={setViewMode}
       />
-      <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} />
+      <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} filePath={filePath} />
       <StatusBar content={content} filePath={filePath} isDirty={isDirty} />
     </div>
   );

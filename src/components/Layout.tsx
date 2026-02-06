@@ -17,9 +17,10 @@ interface LayoutProps {
   theme: Theme;
   showOutline: boolean;
   viewMode: ViewMode;
+  filePath: string | null;
 }
 
-export function Layout({ content, onChange, theme, showOutline, viewMode }: LayoutProps) {
+export function Layout({ content, onChange, theme, showOutline, viewMode, filePath }: LayoutProps) {
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const [previewSearchOpen, setPreviewSearchOpen] = useState(false);
@@ -81,7 +82,7 @@ export function Layout({ content, onChange, theme, showOutline, viewMode }: Layo
     <div className="flex-1 overflow-hidden">
       <Allotment>
         <Allotment.Pane minSize={200} visible={editorVisible}>
-          <Editor ref={editorRef} content={content} onChange={onChange} theme={theme} />
+          <Editor ref={editorRef} content={content} onChange={onChange} theme={theme} filePath={filePath} />
         </Allotment.Pane>
         <Allotment.Pane minSize={200} visible={previewVisible}>
           <div className="h-full flex flex-col">

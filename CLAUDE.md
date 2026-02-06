@@ -17,7 +17,7 @@ DemirMD is a Tauri v2 desktop markdown editor with a React 19 frontend.
 
 **React frontend** (`src/`): Single-page app with hook-based state management (no external store). Data flows down via props from `App.tsx`, which owns all top-level state through custom hooks.
 
-**State hooks** — `useMarkdownDocument` (content, filePath, isDirty), `useTheme` (localStorage-persisted), `useFileOperations` (Tauri dialog + fs plugins), `useKeyboardShortcuts` (Cmd+N/O/S/Shift+S), `useDebounce` (200ms preview delay).
+**State hooks** — `useMarkdownDocument` (content, filePath, isDirty), `useTheme` (localStorage-persisted), `useViewMode` (localStorage-persisted, editor/split/preview), `useFileOperations` (Tauri dialog + fs plugins), `useKeyboardShortcuts` (Cmd+N/O/S/Shift+S/1/2/3), `usePreviewSearch` (CSS Custom Highlight API), `useDebounce` (200ms preview delay).
 
 **Event flow** — Native menu → Tauri emits `"menu-event"` → App listens via `@tauri-apps/api/event` → dispatches to `fileOps` → state updates → components re-render.
 
@@ -30,6 +30,7 @@ DemirMD is a Tauri v2 desktop markdown editor with a React 19 frontend.
 - `@tailwindcss/typography` for prose preview styling
 - Syntax highlighting: GitHub theme (light), Catppuccin Mocha (dark) — custom CSS in `index.css`
 - Editor themes: Custom light theme + `@codemirror/theme-one-dark`
+- Preview search: CSS Custom Highlight API (`::highlight()`) — avoids DOM mutation, styles in `index.css`
 
 ## Tauri Capabilities
 
