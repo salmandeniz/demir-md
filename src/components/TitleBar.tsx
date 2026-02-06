@@ -11,6 +11,8 @@ interface TitleBarProps {
   recentFiles: RecentFile[];
   onOpenRecent: (path: string) => void;
   onClearRecent: () => void;
+  showOutline: boolean;
+  onToggleOutline: () => void;
 }
 
 export function TitleBar({
@@ -22,6 +24,8 @@ export function TitleBar({
   recentFiles,
   onOpenRecent,
   onClearRecent,
+  showOutline,
+  onToggleOutline,
 }: TitleBarProps) {
   const displayName = isDirty ? `${fileName} *` : fileName;
 
@@ -67,7 +71,27 @@ export function TitleBar({
         {displayName}
       </span>
 
-      <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onToggleOutline}
+          className={`p-1.5 rounded-md transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            showOutline
+              ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+              : "text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+          }`}
+          title="Toggle Outline"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <circle cx="3.5" cy="4.5" r="1" fill="currentColor" stroke="none" />
+            <line x1="7" y1="4.5" x2="15" y2="4.5" />
+            <circle cx="3.5" cy="9" r="1" fill="currentColor" stroke="none" />
+            <line x1="7" y1="9" x2="15" y2="9" />
+            <circle cx="3.5" cy="13.5" r="1" fill="currentColor" stroke="none" />
+            <line x1="7" y1="13.5" x2="15" y2="13.5" />
+          </svg>
+        </button>
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+      </div>
     </div>
   );
 }

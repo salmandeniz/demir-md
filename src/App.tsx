@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ask } from "@tauri-apps/plugin-dialog";
@@ -17,6 +17,13 @@ function App() {
   const { content, filePath, isDirty, fileName, setContent, loadDocument, markClean } =
     useMarkdownDocument();
   const { recentFiles, addRecentFile, clearRecentFiles } = useRecentFiles();
+  const [showOutline, setShowOutline] = useState(() => localStorage.getItem("showOutline") === "true");
+  const toggleOutline = useCallback(() => {
+    setShowOutline((prev) => {
+      localStorage.setItem("showOutline", String(!prev));
+      return !prev;
+    });
+  }, []);
 
   const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
@@ -88,8 +95,10 @@ function App() {
         recentFiles={recentFiles}
         onOpenRecent={fileOps.openRecentFile}
         onClearRecent={clearRecentFiles}
+        showOutline={showOutline}
+        onToggleOutline={toggleOutline}
       />
-      <Layout content={content} onChange={setContent} theme={theme} />
+      <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} />
       <StatusBar content={content} filePath={filePath} isDirty={isDirty} />
     </div>
   );
