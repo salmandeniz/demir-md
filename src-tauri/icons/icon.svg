@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="anvil-body" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="anvil-face" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <filter id="orange-glow">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <clipPath id="icon-clip">
+      <rect width="1024" height="1024" rx="220" ry="220"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1024" height="1024" rx="220" ry="220" fill="url(#bg)"/>
+
+  <g clip-path="url(#icon-clip)">
+    <g filter="url(#shadow)" transform="translate(512, 560) scale(1.55) translate(-512, -560)">
+      <path d="M300 420 L724 420 L780 480 L244 480 Z" fill="url(#anvil-face)"/>
+
+      <path d="M340 480 L684 480 L660 560 L364 560 Z" fill="url(#anvil-body)"/>
+
+      <path d="M364 560 L660 560 L640 620 L384 620 Z" fill="#475569"/>
+
+      <path d="M384 620 L640 620 L660 680 L364 680 Z" fill="#334155"/>
+
+      <path d="M244 480 L300 420 L300 460 L200 460 L160 500 L200 540 L340 540 L340 480 Z" fill="url(#anvil-body)"/>
+
+      <path d="M420 680 L604 680 L604 720 L420 720 Z" fill="#475569"/>
+    </g>
+
+    <rect x="190" y="350" width="644" height="12" rx="6" fill="url(#glow)" filter="url(#orange-glow)"/>
+
+    <g fill="#f97316" opacity="0.9">
+      <text x="512" y="560" font-family="system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="460" font-weight="800" text-anchor="middle" dominant-baseline="central" letter-spacing="-8">#</text>
+    </g>
+
+    <rect x="190" y="350" width="644" height="5" rx="2.5" fill="#fdba74" opacity="0.6"/>
+  </g>
+</svg>
