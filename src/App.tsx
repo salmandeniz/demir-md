@@ -5,6 +5,7 @@ import { ask } from "@tauri-apps/plugin-dialog";
 import { useTheme } from "./hooks/useTheme";
 import { useMarkdownDocument } from "./hooks/useMarkdownDocument";
 import { useFileOperations } from "./hooks/useFileOperations";
+import { useRecentFiles } from "./hooks/useRecentFiles";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { TitleBar } from "./components/TitleBar";
 import { Layout } from "./components/Layout";
@@ -15,12 +16,13 @@ function App() {
   const { theme, toggleTheme } = useTheme();
   const { content, filePath, isDirty, fileName, setContent, loadDocument, markClean } =
     useMarkdownDocument();
+  const { recentFiles, addRecentFile, clearRecentFiles } = useRecentFiles();
 
-  const fileOps = useFileOperations({ content, filePath, loadDocument, markClean });
+  const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
   const stableFileOps = useMemo(
     () => fileOps,
-    [fileOps.newFile, fileOps.openFile, fileOps.saveFile, fileOps.saveFileAs],
+    [fileOps.newFile, fileOps.openFile, fileOps.saveFile, fileOps.saveFileAs, fileOps.openRecentFile],
   );
 
   useKeyboardShortcuts(stableFileOps);
@@ -83,6 +85,9 @@ function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
         fileOps={stableFileOps}
+        recentFiles={recentFiles}
+        onOpenRecent={fileOps.openRecentFile}
+        onClearRecent={clearRecentFiles}
       />
       <Layout content={content} onChange={setContent} theme={theme} />
       <StatusBar content={content} filePath={filePath} isDirty={isDirty} />

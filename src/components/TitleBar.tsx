@@ -1,5 +1,6 @@
 import { ThemeToggle } from "./ThemeToggle";
-import type { Theme, FileOperations } from "../types";
+import { RecentFilesMenu } from "./RecentFilesMenu";
+import type { Theme, FileOperations, RecentFile } from "../types";
 
 interface TitleBarProps {
   fileName: string;
@@ -7,6 +8,9 @@ interface TitleBarProps {
   theme: Theme;
   onToggleTheme: () => void;
   fileOps: FileOperations;
+  recentFiles: RecentFile[];
+  onOpenRecent: (path: string) => void;
+  onClearRecent: () => void;
 }
 
 export function TitleBar({
@@ -15,6 +19,9 @@ export function TitleBar({
   theme,
   onToggleTheme,
   fileOps,
+  recentFiles,
+  onOpenRecent,
+  onClearRecent,
 }: TitleBarProps) {
   const displayName = isDirty ? `${fileName} *` : fileName;
 
@@ -35,6 +42,11 @@ export function TitleBar({
         >
           Open
         </button>
+        <RecentFilesMenu
+          recentFiles={recentFiles}
+          onOpenRecent={onOpenRecent}
+          onClearRecent={onClearRecent}
+        />
         <button
           onClick={fileOps.saveFile}
           className="px-3 py-1.5 text-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"

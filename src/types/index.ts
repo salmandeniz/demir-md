@@ -11,9 +11,16 @@ export interface ThemeContextType {
   toggleTheme: () => void;
 }
 
+export interface RecentFile {
+  path: string;
+  name: string;
+  openedAt: number;
+}
+
 export interface FileOperations {
   newFile: () => void;
   openFile: () => Promise<void>;
   saveFile: () => Promise<void>;
   saveFileAs: () => Promise<void>;
+  openRecentFile: (path: string) => Promise<void>;
 }
