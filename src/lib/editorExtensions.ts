@@ -3,6 +3,7 @@ import { languages } from "@codemirror/language-data";
 import { EditorView, lineNumbers, highlightActiveLine } from "@codemirror/view";
 import { bracketMatching } from "@codemirror/language";
 import { history, defaultKeymap, historyKeymap } from "@codemirror/commands";
+import { search, searchKeymap } from "@codemirror/search";
 import { keymap } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 
@@ -14,6 +15,7 @@ export function getEditorExtensions(): Extension[] {
     bracketMatching(),
     history(),
     EditorView.lineWrapping,
-    keymap.of([...defaultKeymap, ...historyKeymap]),
+    search(),
+    keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
   ];
 }
