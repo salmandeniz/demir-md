@@ -7,6 +7,7 @@ import { useMarkdownDocument } from "./hooks/useMarkdownDocument";
 import { useFileOperations } from "./hooks/useFileOperations";
 import { useRecentFiles } from "./hooks/useRecentFiles";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { useViewMode } from "./hooks/useViewMode";
 import { TitleBar } from "./components/TitleBar";
 import { Layout } from "./components/Layout";
 import { StatusBar } from "./components/StatusBar";
@@ -25,6 +26,8 @@ function App() {
     });
   }, []);
 
+  const { viewMode, setViewMode } = useViewMode();
+
   const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
   const stableFileOps = useMemo(
@@ -32,7 +35,7 @@ function App() {
     [fileOps.newFile, fileOps.openFile, fileOps.saveFile, fileOps.saveFileAs, fileOps.openRecentFile],
   );
 
-  useKeyboardShortcuts(stableFileOps);
+  useKeyboardShortcuts(stableFileOps, setViewMode);
 
   useEffect(() => {
     const title = isDirty ? `${fileName} * - DemirMD` : `${fileName} - DemirMD`;
@@ -97,8 +100,10 @@ function App() {
         onClearRecent={clearRecentFiles}
         showOutline={showOutline}
         onToggleOutline={toggleOutline}
+        viewMode={viewMode}
+        onSetViewMode={setViewMode}
       />
-      <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} />
+      <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} />
       <StatusBar content={content} filePath={filePath} isDirty={isDirty} />
     </div>
   );

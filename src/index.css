@@ -181,3 +181,19 @@ body {
 .dark .cm-searchMatch-selected {
   background: rgba(96, 165, 250, 0.35);
 }
+
+::highlight(preview-search) {
+  background-color: rgba(250, 204, 21, 0.3);
+}
+
+::highlight(preview-search-current) {
+  background-color: rgba(59, 130, 246, 0.35);
+}
+
+.dark ::highlight(preview-search) {
+  background-color: rgba(250, 204, 21, 0.25);
+}
+
+.dark ::highlight(preview-search-current) {
+  background-color: rgba(96, 165, 250, 0.35);
+}

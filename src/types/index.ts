@@ -6,6 +6,8 @@ export interface MarkdownDocument {
 
 export type Theme = "light" | "dark";
 
+export type ViewMode = "editor" | "split" | "preview";
+
 export interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;

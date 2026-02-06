@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import type { FileOperations } from "../types";
+import type { FileOperations, ViewMode } from "../types";
 
-export function useKeyboardShortcuts(ops: FileOperations) {
+export function useKeyboardShortcuts(ops: FileOperations, setViewMode: (mode: ViewMode) => void) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
@@ -19,10 +19,19 @@ export function useKeyboardShortcuts(ops: FileOperations) {
       } else if (e.key === "n") {
         e.preventDefault();
         ops.newFile();
+      } else if (e.key === "1") {
+        e.preventDefault();
+        setViewMode("editor");
+      } else if (e.key === "2") {
+        e.preventDefault();
+        setViewMode("split");
+      } else if (e.key === "3") {
+        e.preventDefault();
+        setViewMode("preview");
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [ops]);
+  }, [ops, setViewMode]);
 }

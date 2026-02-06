@@ -1,6 +1,7 @@
 import { ThemeToggle } from "./ThemeToggle";
 import { RecentFilesMenu } from "./RecentFilesMenu";
-import type { Theme, FileOperations, RecentFile } from "../types";
+import { ViewModeToggle } from "./ViewModeToggle";
+import type { Theme, ViewMode, FileOperations, RecentFile } from "../types";
 
 interface TitleBarProps {
   fileName: string;
@@ -13,6 +14,8 @@ interface TitleBarProps {
   onClearRecent: () => void;
   showOutline: boolean;
   onToggleOutline: () => void;
+  viewMode: ViewMode;
+  onSetViewMode: (mode: ViewMode) => void;
 }
 
 export function TitleBar({
@@ -26,6 +29,8 @@ export function TitleBar({
   onClearRecent,
   showOutline,
   onToggleOutline,
+  viewMode,
+  onSetViewMode,
 }: TitleBarProps) {
   const displayName = isDirty ? `${fileName} *` : fileName;
 
@@ -72,6 +77,7 @@ export function TitleBar({
       </span>
 
       <div className="flex items-center gap-2">
+        <ViewModeToggle viewMode={viewMode} onSetViewMode={onSetViewMode} />
         <button
           onClick={onToggleOutline}
           className={`p-1.5 rounded-md transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
