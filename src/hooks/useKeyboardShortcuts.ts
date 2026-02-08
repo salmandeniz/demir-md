@@ -1,7 +1,11 @@
 import { useEffect } from "react";
 import type { FileOperations, ViewMode } from "../types";
 
-export function useKeyboardShortcuts(ops: FileOperations, setViewMode: (mode: ViewMode) => void) {
+export function useKeyboardShortcuts(
+  ops: FileOperations,
+  setViewMode: (mode: ViewMode) => void,
+  setGoToLineOpen?: (open: boolean) => void,
+) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
@@ -28,10 +32,13 @@ export function useKeyboardShortcuts(ops: FileOperations, setViewMode: (mode: Vi
       } else if (e.key === "3") {
         e.preventDefault();
         setViewMode("preview");
+      } else if (e.key.toLowerCase() === "g" && setGoToLineOpen) {
+        e.preventDefault();
+        setGoToLineOpen(true);
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [ops, setViewMode]);
+  }, [ops, setViewMode, setGoToLineOpen]);
 }

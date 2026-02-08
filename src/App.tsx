@@ -9,9 +9,10 @@ import { useRecentFiles } from "./hooks/useRecentFiles";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useViewMode } from "./hooks/useViewMode";
 import { TitleBar } from "./components/TitleBar";
-import { Layout } from "./components/Layout";
+import { Layout, type LayoutRef } from "./components/Layout";
 import { StatusBar } from "./components/StatusBar";
 import { WelcomeScreen } from "./components/WelcomeScreen";
+import { GoToLineDialog } from "./components/GoToLineDialog";
 import "./index.css";
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
   }, []);
 
   const { viewMode, setViewMode } = useViewMode();
+  const [goToLineOpen, setGoToLineOpen] = useState(false);
+  const layoutRef = useRef<LayoutRef>(null);
 
   const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
@@ -36,7 +39,11 @@ function App() {
     [fileOps.newFile, fileOps.openFile, fileOps.saveFile, fileOps.saveFileAs, fileOps.openRecentFile],
   );
 
-  useKeyboardShortcuts(stableFileOps, setViewMode);
+  useKeyboardShortcuts(stableFileOps, setViewMode, setGoToLineOpen);
+
+  const handleGoToLine = useCallback((lineNumber: number) => {
+    layoutRef.current?.goToLine(lineNumber);
+  }, []);
 
   useEffect(() => {
     const title = isDirty ? `${fileName} * - DemirMD` : `${fileName} - DemirMD`;
@@ -89,6 +96,7 @@ function App() {
   }, [fileOps]);
 
   const showWelcome = filePath === null && content === "";
+  const lineCount = content.split("\n").length;
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -113,9 +121,15 @@ function App() {
           onOpenRecent={fileOps.openRecentFile}
         />
       ) : (
-        <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} filePath={filePath} />
+        <Layout ref={layoutRef} content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} filePath={filePath} />
       )}
       <StatusBar content={content} filePath={filePath} isDirty={isDirty} />
+      <GoToLineDialog
+        isOpen={goToLineOpen}
+        onClose={() => setGoToLineOpen(false)}
+        onGoToLine={handleGoToLine}
+        maxLine={lineCount}
+      />
     </div>
   );
 }
