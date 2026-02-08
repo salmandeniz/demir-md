@@ -11,6 +11,7 @@ import { useViewMode } from "./hooks/useViewMode";
 import { TitleBar } from "./components/TitleBar";
 import { Layout } from "./components/Layout";
 import { StatusBar } from "./components/StatusBar";
+import { WelcomeScreen } from "./components/WelcomeScreen";
 import "./index.css";
 
 function App() {
@@ -87,6 +88,8 @@ function App() {
     };
   }, [fileOps]);
 
+  const showWelcome = filePath === null && content === "";
+
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <TitleBar
@@ -103,7 +106,15 @@ function App() {
         viewMode={viewMode}
         onSetViewMode={setViewMode}
       />
-      <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} filePath={filePath} />
+      {showWelcome ? (
+        <WelcomeScreen
+          fileOps={stableFileOps}
+          recentFiles={recentFiles}
+          onOpenRecent={fileOps.openRecentFile}
+        />
+      ) : (
+        <Layout content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} filePath={filePath} />
+      )}
       <StatusBar content={content} filePath={filePath} isDirty={isDirty} />
     </div>
   );

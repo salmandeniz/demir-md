@@ -70,7 +70,10 @@ export function Layout({ content, onChange, theme, showOutline, viewMode, filePa
       const headingIndex = headings.findIndex((h) => h.lineNumber === lineNumber);
       if (headingIndex >= 0) {
         const elements = previewRef.current.querySelectorAll("h1,h2,h3,h4,h5,h6");
-        elements[headingIndex]?.scrollIntoView({ block: "start" });
+        elements[headingIndex]?.scrollIntoView({ 
+          behavior: "smooth",
+          block: "start" 
+        });
       }
     }
   }, [content]);
@@ -103,7 +106,7 @@ export function Layout({ content, onChange, theme, showOutline, viewMode, filePa
           </div>
         </Allotment.Pane>
         <Allotment.Pane minSize={120} preferredSize={200} visible={showOutline}>
-          <Outline content={content} onNavigate={handleNavigate} />
+          <Outline content={content} onNavigate={handleNavigate} previewRef={previewRef} />
         </Allotment.Pane>
       </Allotment>
     </div>
