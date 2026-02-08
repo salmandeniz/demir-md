@@ -8,6 +8,7 @@ import { useFileOperations } from "./hooks/useFileOperations";
 import { useRecentFiles } from "./hooks/useRecentFiles";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useViewMode } from "./hooks/useViewMode";
+import { useAutoSave, checkForAutoSave, clearAutoSaveFile } from "./hooks/useAutoSave";
 import { TitleBar } from "./components/TitleBar";
 import { Layout, type LayoutRef } from "./components/Layout";
 import { StatusBar } from "./components/StatusBar";
@@ -32,6 +33,10 @@ function App() {
   const [goToLineOpen, setGoToLineOpen] = useState(false);
   const layoutRef = useRef<LayoutRef>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [hasRecovered, setHasRecovered] = useState(false);
+  const [isRecoveryChecked, setIsRecoveryChecked] = useState(false);
+
+  const { clearAutoSave } = useAutoSave({ content, filePath, isDirty });
 
   const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
@@ -119,7 +124,46 @@ function App() {
     };
   }, [fileOps]);
 
-  const showWelcome = filePath === null && content === "";
+  // Check for auto-save recovery on mount only
+  useEffect(() => {
+    if (isRecoveryChecked) return;
+    setIsRecoveryChecked(true);
+
+    checkForAutoSave().then((autoSave) => {
+      if (autoSave && autoSave.content) {
+        console.log("[App] Recovering auto-save data");
+        loadDocument(autoSave.content, autoSave.filePath);
+        setHasRecovered(true);
+      }
+    });
+  }, []);
+
+  const handleSaveFile = useCallback(async () => {
+    await fileOps.saveFile();
+    await clearAutoSave();
+  }, [fileOps, clearAutoSave]);
+
+  const handleSaveFileAs = useCallback(async () => {
+    await fileOps.saveFileAs();
+    await clearAutoSave();
+  }, [fileOps, clearAutoSave]);
+
+  const handleNewFile = useCallback(async () => {
+    await clearAutoSaveFile();
+    fileOps.newFile();
+  }, [fileOps]);
+
+  const fileOpsWithAutoSave = useMemo(
+    () => ({
+      ...stableFileOps,
+      saveFile: handleSaveFile,
+      saveFileAs: handleSaveFileAs,
+      newFile: handleNewFile,
+    }),
+    [stableFileOps, handleSaveFile, handleSaveFileAs, handleNewFile],
+  );
+
+  const showWelcome = filePath === null && content === "" && !hasRecovered;
   const lineCount = content.split("\n").length;
 
   return (
@@ -129,7 +173,7 @@ function App() {
         isDirty={isDirty}
         theme={theme}
         onToggleTheme={toggleTheme}
-        fileOps={stableFileOps}
+        fileOps={fileOpsWithAutoSave}
         recentFiles={recentFiles}
         onOpenRecent={fileOps.openRecentFile}
         onClearRecent={clearRecentFiles}
@@ -140,7 +184,7 @@ function App() {
       />
       {showWelcome ? (
         <WelcomeScreen
-          fileOps={stableFileOps}
+          fileOps={fileOpsWithAutoSave}
           recentFiles={recentFiles}
           onOpenRecent={fileOps.openRecentFile}
         />
