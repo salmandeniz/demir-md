@@ -31,6 +31,7 @@ function App() {
   const { viewMode, setViewMode } = useViewMode();
   const [goToLineOpen, setGoToLineOpen] = useState(false);
   const layoutRef = useRef<LayoutRef>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
@@ -95,11 +96,34 @@ function App() {
     };
   }, [fileOps]);
 
+  useEffect(() => {
+    const window = getCurrentWindow();
+
+    const unlistenDragDrop = window.onDragDropEvent((event) => {
+      if (event.payload.type === "over") {
+        setIsDragOver(true);
+      } else if (event.payload.type === "drop") {
+        setIsDragOver(false);
+        const paths = event.payload.paths;
+        const mdFile = paths.find((p) => p.toLowerCase().endsWith(".md"));
+        if (mdFile) {
+          fileOps.openRecentFile(mdFile);
+        }
+      } else if (event.payload.type === "leave") {
+        setIsDragOver(false);
+      }
+    });
+
+    return () => {
+      unlistenDragDrop.then((fn) => fn());
+    };
+  }, [fileOps]);
+
   const showWelcome = filePath === null && content === "";
   const lineCount = content.split("\n").length;
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className={`flex flex-col h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${isDragOver ? "ring-4 ring-blue-500 ring-inset" : ""}`}>
       <TitleBar
         fileName={fileName}
         isDirty={isDirty}
