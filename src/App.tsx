@@ -11,6 +11,7 @@ import { useRecentFiles } from "./hooks/useRecentFiles";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useViewMode } from "./hooks/useViewMode";
 import { useAutoSave, checkForAutoSave, clearAutoSaveFile } from "./hooks/useAutoSave";
+import { useZoom } from "./hooks/useZoom";
 import { TitleBar } from "./components/TitleBar";
 import { Layout, type LayoutRef } from "./components/Layout";
 import { StatusBar } from "./components/StatusBar";
@@ -39,6 +40,7 @@ function App() {
   const [isRecoveryChecked, setIsRecoveryChecked] = useState(false);
 
   const { clearAutoSave } = useAutoSave({ content, filePath, isDirty });
+  useZoom();
 
   const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
