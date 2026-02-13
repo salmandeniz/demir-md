@@ -42,6 +42,10 @@ Standard `.quit()` replaced with custom quit menu item to avoid WebKit SIGSEGV c
 - Editor themes: Custom light theme + `@codemirror/theme-one-dark`
 - Preview search: CSS Custom Highlight API (`::highlight()`) — avoids DOM mutation, styles in `index.css`
 
+## Icon
+
+Source SVG at `src-tauri/icons/icon.svg`. Design: geometric # (markdown heading) with hot-metal gradient (silver→orange) on dark slate background. Built as path-based mask with `linearGradient` fill — no text elements. To regenerate all sizes: render SVG to 1024×1024 PNG (cairosvg), then `npx tauri icon src-tauri/icons/icon.png`.
+
 ## Tauri Capabilities
 
 Permissions in `src-tauri/capabilities/default.json`. FS scope limited to `$HOME`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD`. Dialog permissions include open, save, ask, message.
