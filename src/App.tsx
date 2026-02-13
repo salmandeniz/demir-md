@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { readTextFile } from "@tauri-apps/plugin-fs";
 import { ask } from "@tauri-apps/plugin-dialog";
 import { useTheme } from "./hooks/useTheme";
 import { useMarkdownDocument } from "./hooks/useMarkdownDocument";
@@ -63,16 +65,15 @@ function App() {
 
   useEffect(() => {
     const unlisten = getCurrentWindow().onCloseRequested(async (event) => {
+      event.preventDefault();
       if (isDirtyRef.current) {
-        event.preventDefault();
         const confirmed = await ask("You have unsaved changes. Close anyway?", {
           title: "Unsaved Changes",
           kind: "warning",
         });
-        if (confirmed) {
-          getCurrentWindow().destroy();
-        }
+        if (!confirmed) return;
       }
+      await invoke("quit_app");
     });
     return () => {
       unlisten.then((fn) => fn());
@@ -80,7 +81,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const unlisten = listen<string>("menu-event", (event) => {
+    const unlisten = listen<string>("menu-event", async (event) => {
       switch (event.payload) {
         case "new":
           fileOps.newFile();
@@ -93,6 +94,16 @@ function App() {
           break;
         case "save_as":
           fileOps.saveFileAs();
+          break;
+        case "quit":
+          if (isDirtyRef.current) {
+            const confirmed = await ask("You have unsaved changes. Quit anyway?", {
+              title: "Unsaved Changes",
+              kind: "warning",
+            });
+            if (!confirmed) return;
+          }
+          await invoke("quit_app");
           break;
       }
     });
@@ -124,18 +135,36 @@ function App() {
     };
   }, [fileOps]);
 
-  // Check for auto-save recovery on mount only
+  useEffect(() => {
+    const unlisten = listen<string>("open-file", async (event) => {
+      const text = await readTextFile(event.payload);
+      loadDocument(text, event.payload);
+      addRecentFile(event.payload);
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, [loadDocument, addRecentFile]);
+
   useEffect(() => {
     if (isRecoveryChecked) return;
     setIsRecoveryChecked(true);
 
-    checkForAutoSave().then((autoSave) => {
+    (async () => {
+      const openedPath = await invoke<string | null>("get_opened_file");
+      if (openedPath) {
+        const text = await readTextFile(openedPath);
+        loadDocument(text, openedPath);
+        addRecentFile(openedPath);
+        return;
+      }
+
+      const autoSave = await checkForAutoSave();
       if (autoSave && autoSave.content) {
-        console.log("[App] Recovering auto-save data");
         loadDocument(autoSave.content, autoSave.filePath);
         setHasRecovered(true);
       }
-    });
+    })();
   }, []);
 
   const handleSaveFile = useCallback(async () => {

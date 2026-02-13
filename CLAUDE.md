@@ -13,7 +13,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 DemirMD is a Tauri v2 desktop markdown editor with a React 19 frontend.
 
-**Rust backend** (`src-tauri/`): Tauri app entry point, native menu system (File/Edit), and event bridge. Menus emit `"menu-event"` to the frontend via `app_handle.emit()`. Uses `MenuBuilder`/`SubmenuBuilder`/`MenuItemBuilder` APIs.
+**Rust backend** (`src-tauri/`): Tauri app entry point, native menu system (File/Edit), event bridge, and Tauri commands. Menus emit `"menu-event"` to the frontend via `app_handle.emit()`. Uses `MenuBuilder`/`SubmenuBuilder`/`MenuItemBuilder` APIs. Uses `.build().run()` pattern (not `.run()`) to handle `RunEvent::Opened` for file associations.
+
+**Tauri commands** — `get_opened_file` (returns file path from "Open With" launch), `quit_app` (hides windows then `process::exit(0)` to avoid WebKit crash).
 
 **React frontend** (`src/`): Single-page app with hook-based state management (no external store). Data flows down via props from `App.tsx`, which owns all top-level state through custom hooks.
 
@@ -22,6 +24,14 @@ DemirMD is a Tauri v2 desktop markdown editor with a React 19 frontend.
 **Event flow** — Native menu → Tauri emits `"menu-event"` → App listens via `@tauri-apps/api/event` → dispatches to `fileOps` → state updates → components re-render.
 
 **Split pane** — `allotment` library. CSS import must be done in JS/TSX (`import "allotment/dist/style.css"`), not via CSS `@import` (Tailwind v4 + Vite limitation).
+
+## File Associations & Open With
+
+Registered in `tauri.conf.json` under `bundle.fileAssociations` for `.md`, `.markdown`, `.mdx`. On macOS, "Open With" sends an Apple Event → Tauri fires `RunEvent::Opened { urls }` → Rust stores path in `OpenedFile` state and emits `"open-file"` event. Frontend checks `get_opened_file` on mount (priority over auto-save recovery) and listens for `"open-file"` at runtime.
+
+## Graceful Quit
+
+Standard `.quit()` replaced with custom quit menu item to avoid WebKit SIGSEGV crash (WKWebView use-after-free during teardown). Both ⌘Q and window close button route through frontend → unsaved changes check → `invoke("quit_app")` → Rust hides all windows (stops WebKit rendering) → `process::exit(0)`.
 
 ## Styling
 
