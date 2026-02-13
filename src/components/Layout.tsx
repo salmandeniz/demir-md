@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, forwardRef } from "react";
 import { Allotment } from "allotment";
 import { EditorView } from "@codemirror/view";
+import { undo as cmUndo, redo as cmRedo } from "@codemirror/commands";
 import { EditorSelection } from "@codemirror/state";
 import type { ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { Editor } from "./Editor";
@@ -13,6 +14,8 @@ import type { Theme, ViewMode } from "../types";
 
 export interface LayoutRef {
   goToLine: (lineNumber: number) => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 interface LayoutProps {
@@ -66,9 +69,27 @@ export const Layout = forwardRef<LayoutRef, LayoutProps>(
       }
     }, [content]);
 
+    const undo = useCallback(() => {
+      const view = editorRef.current?.view;
+      if (view) {
+        cmUndo(view);
+        view.focus();
+      }
+    }, []);
+
+    const redo = useCallback(() => {
+      const view = editorRef.current?.view;
+      if (view) {
+        cmRedo(view);
+        view.focus();
+      }
+    }, []);
+
     useImperativeHandle(ref, () => ({
       goToLine,
-    }), [goToLine]);
+      undo,
+      redo,
+    }), [goToLine, undo, redo]);
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {

@@ -5,10 +5,29 @@ export function useKeyboardShortcuts(
   ops: FileOperations,
   setViewMode: (mode: ViewMode) => void,
   setGoToLineOpen?: (open: boolean) => void,
+  undo?: () => void,
+  redo?: () => void,
 ) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
+
+      if (mod && e.key === "z" && e.shiftKey) {
+        e.preventDefault();
+        redo?.();
+        return;
+      }
+
+      if (mod && (e.key === "z" || e.key === "y")) {
+        e.preventDefault();
+        if (e.key === "z") {
+          undo?.();
+        } else if (e.key === "y") {
+          redo?.();
+        }
+        return;
+      }
+
       if (!mod) return;
 
       if (e.key === "s" && e.shiftKey) {
@@ -40,5 +59,5 @@ export function useKeyboardShortcuts(
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [ops, setViewMode, setGoToLineOpen]);
+  }, [ops, setViewMode, setGoToLineOpen, undo, redo]);
 }

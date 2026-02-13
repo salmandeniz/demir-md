@@ -49,7 +49,7 @@ function App() {
     [fileOps.newFile, fileOps.openFile, fileOps.saveFile, fileOps.saveFileAs, fileOps.openRecentFile],
   );
 
-  useKeyboardShortcuts(stableFileOps, setViewMode, setGoToLineOpen);
+  useKeyboardShortcuts(stableFileOps, setViewMode, setGoToLineOpen, () => layoutRef.current?.undo(), () => layoutRef.current?.redo());
 
   const handleGoToLine = useCallback((lineNumber: number) => {
     layoutRef.current?.goToLine(lineNumber);
