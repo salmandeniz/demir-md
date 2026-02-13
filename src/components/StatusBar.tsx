@@ -2,9 +2,10 @@ interface StatusBarProps {
   content: string;
   filePath: string | null;
   isDirty: boolean;
+  zoom?: number;
 }
 
-export function StatusBar({ content, filePath, isDirty }: StatusBarProps) {
+export function StatusBar({ content, filePath, isDirty, zoom = 100 }: StatusBarProps) {
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
   const charCount = content.length;
   const lineCount = content.split("\n").length;
@@ -19,6 +20,7 @@ export function StatusBar({ content, filePath, isDirty }: StatusBarProps) {
         <span>{readingTimeMinutes} min read</span>
       </div>
       <div className="flex items-center gap-4">
+        {zoom !== 100 && <span>{zoom}%</span>}
         {isDirty && <span className="text-amber-500">Modified</span>}
         <span className="truncate max-w-xs" title={filePath ?? undefined}>
           {filePath ?? "No file"}

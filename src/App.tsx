@@ -40,7 +40,7 @@ function App() {
   const [isRecoveryChecked, setIsRecoveryChecked] = useState(false);
 
   const { clearAutoSave } = useAutoSave({ content, filePath, isDirty });
-  useZoom();
+  const { zoom } = useZoom();
 
   const fileOps = useFileOperations({ content, filePath, loadDocument, markClean, addRecentFile });
 
@@ -222,7 +222,7 @@ function App() {
       ) : (
         <Layout ref={layoutRef} content={content} onChange={setContent} theme={theme} showOutline={showOutline} viewMode={viewMode} filePath={filePath} />
       )}
-      <StatusBar content={content} filePath={filePath} isDirty={isDirty} />
+      <StatusBar content={content} filePath={filePath} isDirty={isDirty} zoom={zoom} />
       <GoToLineDialog
         isOpen={goToLineOpen}
         onClose={() => setGoToLineOpen(false)}
