@@ -43,10 +43,14 @@ export function imagePasteHandler(filePath: string | null): Extension {
       const relativePath = `./${baseName}_assets/${fileName}`;
 
       imageFile.arrayBuffer().then(async (buffer) => {
-        await mkdir(assetsDir, { recursive: true });
-        await writeFile(imagePath, new Uint8Array(buffer));
-        const insert = `![](${relativePath})`;
-        view.dispatch(view.state.replaceSelection(insert));
+        try {
+          await mkdir(assetsDir, { recursive: true });
+          await writeFile(imagePath, new Uint8Array(buffer));
+          const insert = `![](${relativePath})`;
+          view.dispatch(view.state.replaceSelection(insert));
+        } catch (err) {
+          message(`Failed to save image: ${err}`, { title: "Image Paste Error", kind: "error" });
+        }
       });
 
       return true;
