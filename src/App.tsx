@@ -139,9 +139,13 @@ function App() {
 
   useEffect(() => {
     const unlisten = listen<string>("open-file", async (event) => {
-      const text = await readTextFile(event.payload);
-      loadDocument(text, event.payload);
-      addRecentFile(event.payload);
+      try {
+        const text = await readTextFile(event.payload);
+        loadDocument(text, event.payload);
+        addRecentFile(event.payload);
+      } catch (err) {
+        console.error(err);
+      }
     });
     return () => {
       unlisten.then((fn) => fn());
@@ -153,18 +157,26 @@ function App() {
     setIsRecoveryChecked(true);
 
     (async () => {
-      const openedPath = await invoke<string | null>("get_opened_file");
-      if (openedPath) {
-        const text = await readTextFile(openedPath);
-        loadDocument(text, openedPath);
-        addRecentFile(openedPath);
-        return;
-      }
+      try {
+        const openedPath = await invoke<string | null>("get_opened_file");
+        if (openedPath) {
+          try {
+            const text = await readTextFile(openedPath);
+            loadDocument(text, openedPath);
+            addRecentFile(openedPath);
+            return;
+          } catch (readErr) {
+            // ignore - will fall through to autosave recovery
+          }
+        }
 
-      const autoSave = await checkForAutoSave();
-      if (autoSave && autoSave.content) {
-        loadDocument(autoSave.content, autoSave.filePath);
-        setHasRecovered(true);
+        const autoSave = await checkForAutoSave();
+        if (autoSave && autoSave.content) {
+          loadDocument(autoSave.content, autoSave.filePath);
+          setHasRecovered(true);
+        }
+      } catch (err) {
+        console.error(err);
       }
     })();
   }, []);

@@ -26,6 +26,14 @@ pub fn run() {
         .manage(OpenedFile(Mutex::new(None)))
         .invoke_handler(tauri::generate_handler![get_opened_file, quit_app])
         .setup(|app| {
+            let args: Vec<String> = std::env::args().collect();
+            if args.len() > 1 {
+                let file_path = &args[1];
+                let state = app.state::<OpenedFile>();
+                *state.0.lock().unwrap() = Some(file_path.clone());
+                let _ = app.emit("open-file", file_path.clone());
+            }
+
             let new_file = MenuItemBuilder::with_id("new", "New")
                 .accelerator("CmdOrCtrl+N")
                 .build(app)?;
